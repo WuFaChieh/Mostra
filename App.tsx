@@ -1277,7 +1277,7 @@ function SubmitView({ user, onSubmit, onCancel }: { user: User, onSubmit: (ex: E
 
   return (
     <div className="min-h-screen bg-white animate-in slide-in-from-bottom-20 duration-500 pb-20">
-      <div className="sticky top-0 bg-white/90 backdrop-blur border-b border-gray-100 px-4 py-5 flex items-center justify-between z-10 safe-top">
+      <div className="sticky top-0 bg-white/90 backdrop-blur border-b border-gray-100 px-4 pb-4 flex items-center justify-between z-10 safe-top">
         <button onClick={onCancel} className="text-base font-medium text-gray-500">取消</button>
         <h1 className="font-bold text-xl">提交展訊</h1>
         <button 
@@ -1405,7 +1405,7 @@ function SubmitView({ user, onSubmit, onCancel }: { user: User, onSubmit: (ex: E
       <style>{`
         .input-base { width: 100%; padding: 0.75rem; border-radius: 0.75rem; background-color: #f9fafb; border: 1px solid #f3f4f6; font-size: 0.9rem; outline: none; transition: all 0.2s; }
         .input-base:focus { background-color: white; border-color: black; box-shadow: 0 0 0 1px black; }
-        .safe-top { padding-top: env(safe-area-inset-top); }
+        .safe-top { padding-top: calc(env(safe-area-inset-top) + 2rem); }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
       `}</style>
