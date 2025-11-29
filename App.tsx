@@ -1277,14 +1277,14 @@ function SubmitView({ user, onSubmit, onCancel }: { user: User, onSubmit: (ex: E
 
   return (
     <div className="min-h-screen bg-white animate-in slide-in-from-bottom-20 duration-500 pb-20">
-      <div className="sticky top-0 bg-white/90 backdrop-blur border-b border-gray-100 px-4 py-3 flex items-center justify-between z-10 safe-top">
-        <button onClick={onCancel} className="text-sm font-medium text-gray-500">取消</button>
-        <h1 className="font-bold text-base">提交展訊</h1>
+      <div className="sticky top-0 bg-white/90 backdrop-blur border-b border-gray-100 px-4 py-5 flex items-center justify-between z-10 safe-top">
+        <button onClick={onCancel} className="text-base font-medium text-gray-500">取消</button>
+        <h1 className="font-bold text-xl">提交展訊</h1>
         <button 
           onClick={handleSubmit} 
           // Fake form submission via button to keep header clean
           form="submit-form"
-          className="text-sm font-bold text-blue-600"
+          className="text-base font-bold text-blue-600"
         >
           發布
         </button>
