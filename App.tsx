@@ -20,7 +20,8 @@ import {
   Camera,
   Landmark,
   Baby,
-  History
+  History,
+  Share2
 } from 'lucide-react';
 import { Exhibition, User, Notification, ViewState, Comment } from './types';
 import { generateCuratorInsight, enhanceExhibitionDraft } from './services/geminiService';
@@ -29,6 +30,32 @@ import { StarRating } from './components/StarRating';
 // --- 常數設定 ---
 // 當圖片無法載入時使用的預設圖片 (藝廊空間)
 const FALLBACK_IMAGE = "https://images.unsplash.com/photo-1518998053901-5348d3969105?q=80&w=800&auto=format&fit=crop";
+// 產品 Logo
+const LOGO_URL = "https://file-s.s3.amazonaws.com/file_s/51a37c4b-449e-4b47-b27b-240833777085";
+
+// --- Logo Component for Error Handling ---
+const Logo = ({ className = "w-8 h-8", size = "small" }: { className?: string, size?: "small" | "large" }) => {
+  const [error, setError] = useState(false);
+
+  if (error) {
+    // Render a fallback M icon styled like the brand
+    return (
+      <div className={`${className} bg-black flex items-center justify-center rounded-lg shadow-sm text-white font-serif font-bold ${size === 'large' ? 'text-4xl' : 'text-xl'}`}>
+        M
+      </div>
+    );
+  }
+
+  return (
+    <img 
+      src={LOGO_URL} 
+      alt="Mostra Logo" 
+      className={`${className} object-contain`} 
+      onError={() => setError(true)}
+      crossOrigin="anonymous"
+    />
+  );
+};
 
 // --- 真實台灣展覽資料 (擴充至 20 筆) ---
 const INITIAL_EXHIBITIONS: Exhibition[] = [
@@ -473,7 +500,7 @@ export default function App() {
       {(view === 'home' || view === 'detail' || view === 'collections' || view === 'categories') && (
         <nav className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-gray-100 safe-top px-4 h-14 flex items-center justify-between">
           <button onClick={() => setView('home')} className="flex items-center gap-2">
-             <div className="w-7 h-7 bg-black text-white flex items-center justify-center font-serif font-bold text-lg rounded-sm">M</div>
+             <Logo />
              <span className="font-serif text-lg font-bold tracking-tight">Mostra</span>
           </button>
 
@@ -943,6 +970,22 @@ function DetailView({
     setIsLoadingAi(false);
   };
 
+  const handleShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: exhibition.title,
+          text: `推薦這個展覽給你：${exhibition.title} @ ${exhibition.artist}\n${exhibition.description}`,
+          url: window.location.href
+        });
+      } catch (err) {
+        console.log('Share failed', err);
+      }
+    } else {
+      alert('您的瀏覽器不支援原生分享功能');
+    }
+  };
+
   const handleSubmitComment = (e: React.FormEvent) => {
     e.preventDefault();
     if (!commentText.trim()) return;
@@ -981,13 +1024,23 @@ function DetailView({
            <ChevronLeft size={24} className="text-black" />
          </button>
          
-         {/* Bookmark Fab */}
-         <button 
-           onClick={(e) => onToggleBookmark(e, exhibition.id)}
-           className="absolute -bottom-6 right-6 z-10 w-12 h-12 bg-black text-white rounded-full shadow-lg shadow-black/20 flex items-center justify-center hover:scale-105 active:scale-95 transition-transform"
-         >
-            <Bookmark size={20} className={isBookmarked ? "fill-white" : ""} />
-         </button>
+         <div className="absolute -bottom-6 right-6 z-10 flex gap-3">
+           {/* Share Button */}
+           <button 
+             onClick={handleShare}
+             className="w-12 h-12 bg-white text-black rounded-full shadow-lg shadow-black/10 flex items-center justify-center hover:scale-105 active:scale-95 transition-transform"
+           >
+              <Share2 size={20} />
+           </button>
+           
+           {/* Bookmark Fab */}
+           <button 
+             onClick={(e) => onToggleBookmark(e, exhibition.id)}
+             className="w-12 h-12 bg-black text-white rounded-full shadow-lg shadow-black/20 flex items-center justify-center hover:scale-105 active:scale-95 transition-transform"
+           >
+              <Bookmark size={20} className={isBookmarked ? "fill-white" : ""} />
+           </button>
+         </div>
       </div>
 
       <div className="px-5 pt-10 pb-8">
@@ -1162,7 +1215,7 @@ function LoginView({ onLogin, onCancel }: { onLogin: () => void, onCancel: () =>
     <div className="min-h-screen flex flex-col justify-center px-6 animate-in zoom-in-95 duration-300 -mt-20">
       <div className="w-full max-w-sm mx-auto">
         <div className="text-center mb-10">
-          <div className="w-16 h-16 bg-black text-white mx-auto flex items-center justify-center font-serif font-bold text-3xl rounded-lg mb-6 shadow-xl shadow-gray-200">M</div>
+          <Logo className="w-24 h-24 mx-auto mb-6" size="large" />
           <h2 className="text-2xl font-bold font-serif mb-2">歡迎回來</h2>
           <p className="text-gray-500 text-sm">登入 Mostra，開啟您的藝術旅程</p>
         </div>
@@ -1405,7 +1458,7 @@ function SubmitView({ user, onSubmit, onCancel }: { user: User, onSubmit: (ex: E
       <style>{`
         .input-base { width: 100%; padding: 0.75rem; border-radius: 0.75rem; background-color: #f9fafb; border: 1px solid #f3f4f6; font-size: 0.9rem; outline: none; transition: all 0.2s; }
         .input-base:focus { background-color: white; border-color: black; box-shadow: 0 0 0 1px black; }
-        .safe-top { padding-top: calc(env(safe-area-inset-top) + 2rem); }
+        .safe-top { padding-top: calc(env(safe-area-inset-top) + 2rem); } // Keep this as adjusted in previous step
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
       `}</style>
